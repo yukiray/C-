@@ -162,3 +162,133 @@ namespace s03490030
         }
     }
 }
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.IO;
+
+namespace s03490030
+{
+    
+    public partial class Form2 : Form
+    {
+        String RunLED;
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private static int Previous_FileIndex = 0;
+        
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            timer1.Interval = 300;
+            timer1.Enabled = true;
+
+            const int MaxNumVideos = 14;
+            Random ranObj = new Random();
+            int FileIndex;
+            DirectoryInfo dir = new DirectoryInfo(Application.StartupPath);
+            String FilePath = dir.Parent.Parent.Parent.FullName + "\\if i stay\\";
+            String FileName = String.Empty;  //You have to do the same thing, just let it be set to empty
+
+
+            // 以下程式碼為隨機選歌, 如果選到與前一首相同再換一首
+            do
+            {
+                FileIndex = ranObj.Next(1, MaxNumVideos + 1);
+            } 
+            
+            while (FileIndex == Previous_FileIndex);
+            
+            Previous_FileIndex = FileIndex;
+            switch (FileIndex)
+            {
+                case 1: FileName = "Ane Brun Halo- feat. Linnea Olsson.mp4";
+                    break;
+                case 2: FileName = "Ben Howard - Promise.mp4";
+                    break;
+                case 3: FileName = "I Never Wanted To Go _  Willamette Stone.mp4";
+                    break;
+                case 4: FileName = "I Want What You Have - Willamette Stone .mp4";
+                    break;
+                case 5: FileName = "Lucius-Until We Get There.mp4";
+                    break;
+                case 6: FileName = "Mia Hall and Adam Wilde - Heart Like Yours .mp4";
+                    break;
+                case 7: FileName = "Mind - Willamette Stone.mp4";
+                    break;
+                case 8: FileName = "Odessa - I Will Be There.mp4";
+                    break;
+                case 9: FileName = "Official Tom Odell - Heal.mp4";
+                    break;
+                case 10: FileName = "Sonic Youth - Karen Revisited.mp4";
+                    break;
+                case 11: FileName = "Tanlines - All Of Me.mp4";
+                    break;
+                case 12: FileName = "The Orwells - Who Needs You-.mp4";
+                    break;
+                case 13: FileName = "Today by Willamette Stone .mp4";
+                    break;
+                case 14: FileName = "Willamette Stone - Never Coming Down.mp4";
+                    break;
+                default:
+                    break;
+            }
+            FilePath = FilePath + FileName; //合併影片檔案所在的完整路徑與名稱
+            this.Text = FileName;
+            RunLED = FileName;
+
+            axWindowsMediaPlayer1.uiMode = "Full";//選取模式有視窗狀態、播放、停止、靜音、音量控制
+                                                  //、上一段、下一段、快轉、倒帶等所有完整的控制列
+            axWindowsMediaPlayer1.URL = @FilePath;      //影片檔案路徑
+            axWindowsMediaPlayer1.settings.volume = 40; //WMP音量預設值 <min 0 ~ 100 max>
+            axWindowsMediaPlayer1.settings.setMode("loop", true);  // 設定重複播放，可參考http://www.cnblogs.com/Jacklovely/p/5672824.html
+            axWindowsMediaPlayer1.Ctlcontrols.play();   //開始播放影片            
+        }// end of Form2_Load()
+
+        private void Form2_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            axWindowsMediaPlayer1.Ctlcontrols.stop(); //停止播放影片
+
+            Form1 frm1 = new Form1();
+
+            frm1.Show();
+            this.Close();               //隱藏表單2     
+        }
+
+        private void Form2_Resize(object sender, EventArgs e)
+        {
+            //occupies all the form's available space
+            axWindowsMediaPlayer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            //again, the player is the same size as form
+            axWindowsMediaPlayer1.settings.autoStart = true;	//自動播放
+            axWindowsMediaPlayer1.Size = this.Size;
+            axWindowsMediaPlayer1.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
+
+        }
+
+        private void axWindowsMediaPlayer1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            String str1;
+            String str2;
+
+            str1 = RunLED.Substring(1); //從RunLED中擷取子字串，子字串會在指定的字元位置(索引值=1)開始並繼續到字串的結尾。
+            str2 = RunLED.Substring(0,1); //從RunLED中擷取子字串，子字串起始於指定的字元位置(索引值=0)開始，並且具有指定的字串擷取長度(=1各字元)。
+            RunLED =str1 +str2; //合併字串
+            this.Text = RunLED;
+        }
+    }
+}
